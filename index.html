@@ -153,6 +153,9 @@
     margin-top:32px; padding-top:14px; border-top:1px solid var(--line);
     font-family:var(--mono); font-size:10.5px; color:var(--ink-dim); line-height:1.8;
   }
+  footer a{color:#e5c169; text-decoration:none;}
+  footer a:hover{text-decoration:underline;}
+  footer .footer-links{margin-top:6px;}
 </style>
 </head>
 <body>
@@ -256,6 +259,10 @@
 
   <footer>
     ※ 本ツールは実際の排出結果を保証するものではありません。
+    <div class="footer-links">
+      CONTACT: <a href="https://x.com/LRLG_game" target="_blank" rel="noopener">@LRLG_game</a>
+      　／　不具合報告: <a href="https://github.com/lyricallogical/gfl2-gacha-calculator/issues" target="_blank" rel="noopener">GitHub Issues</a>
+    </div>
   </footer>
 
 </div>
@@ -521,4 +528,20 @@
     tbody.innerHTML = '';
     const labels = isWeapon
       ? ['R1 (1本)','R2 (2本)','R3 (3本)','R4 (4本)','R5 (5本)','R6 (6本)']
-      : ['V0 (1体)','V1 (2体)','V2 (3体)','V3 (4体)','V4 (5体)','
+      : ['V0 (1体)','V1 (2体)','V2 (3体)','V3 (4体)','V4 (5体)','V5 (6体)','V6 (7体)'];
+    rows.forEach((r,idx)=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${labels[idx]}</td>` +
+        `<td class="highlight">${fmtNum1(r.exp)}</td>` +
+        r.percs.map(v=>`<td>${fmtInt(v)}</td>`).join('');
+      tbody.appendChild(tr);
+    });
+  }
+
+  $('runBtn').addEventListener('click', run);
+  updateFortHeaders();
+  run();
+})();
+</script>
+</body>
+</html>
