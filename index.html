@@ -6,18 +6,32 @@
 <title>ドールズフロントライン2 ガチャ期待値計算機</title>
 <style>
   :root{
-    --bg:#12140f;
-    --panel:#1a1d15;
-    --panel-2:#20241a;
+    --bg:#1b1e17;
+    --panel:#252a1f;
+    --panel-2:#2d3327;
     --line:#3a4030;
-    --amber:#c9a24b;
-    --amber-dim:#8a7238;
-    --green:#8fae5e;
-    --red:#b5583f;
-    --ink:#e8e4d4;
-    --ink-dim:#9a9789;
+    --amber:#6fa8c9;
+    --amber-dim:#3f5f73;
+    --ink:#f2efe3;
+    --ink-dim:#b3b0a1;
     --mono: "IBM Plex Mono","SFMono-Regular",Consolas,monospace;
     --sans: "IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+    /* percentile-column emphasis scale: best(10%) -> worst(99%) */
+    --pct-1:#ffffff;
+    --pct-2:#e6e4dc;
+    --pct-3:#d3d1c6;
+    --pct-4:#bfbdb1;
+    --pct-5:#acaa9d;
+    --pct-6:#989688;
+    --pct-7:#847f72;
+    /* matching header scale, anchored on the accent color at 99% */
+    --hdr-1:#ebf6fb;
+    --hdr-2:#d6e9f3;
+    --hdr-3:#c1dcea;
+    --hdr-4:#adcfe2;
+    --hdr-5:#98c2da;
+    --hdr-6:#83b5d1;
+    --hdr-7:var(--amber);
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -86,7 +100,7 @@
   }
   .field label .val{color:var(--amber); font-weight:600;}
   input[type=number], select{
-    width:100%; background:#0e100b; border:1px solid var(--line); color:var(--ink);
+    width:100%; background:#15170f; border:1px solid var(--line); color:var(--ink);
     font-family:var(--mono); font-size:13px; padding:8px 10px; border-radius:2px;
   }
   input[type=number]:focus, select:focus{outline:1px solid var(--amber); border-color:var(--amber);}
@@ -94,14 +108,14 @@
   .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
   .toggle{
     display:flex; align-items:center; gap:9px; font-family:var(--mono); font-size:12px;
-    color:var(--ink); padding:9px 10px; background:#0e100b; border:1px solid var(--line);
+    color:var(--ink); padding:9px 10px; background:#15170f; border:1px solid var(--line);
     cursor:pointer; user-select:none; margin-bottom:10px;
   }
   .toggle input{accent-color:var(--amber); width:15px; height:15px;}
   .preset-btns{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:16px;}
   .preset-btns button{
     font-family:var(--mono); font-size:11px; letter-spacing:.05em; padding:9px 6px;
-    background:#0e100b; color:var(--ink-dim); border:1px solid var(--line); cursor:pointer;
+    background:#15170f; color:var(--ink-dim); border:1px solid var(--line); cursor:pointer;
     text-transform:uppercase; transition:.12s;
   }
   .preset-btns button.active{color:var(--bg); background:var(--amber); border-color:var(--amber);}
@@ -109,14 +123,15 @@
   .note{font-family:var(--mono); font-size:10.5px; color:var(--ink-dim); line-height:1.6; margin-top:10px; border-top:1px dashed var(--line); padding-top:10px;}
 
   .runbtn{
-    width:100%; margin-top:6px; padding:13px; background:var(--amber); color:#141508;
+    width:100%; margin-top:6px; padding:13px; background:var(--amber); color:#0d1e26;
     border:none; font-family:var(--mono); font-weight:700; font-size:13px; letter-spacing:.1em;
     text-transform:uppercase; cursor:pointer;
   }
-  .runbtn:hover{background:#dab35c;}
+  .runbtn:hover{background:var(--hdr-4);}
 
   /* Results */
-  .summary-cards{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line); margin-bottom:20px;}
+  .summary-cards{display:grid; grid-template-columns:repeat(2,1fr); gap:1px; background:var(--line); border:1px solid var(--line); margin-bottom:20px;}
+  @media (min-width:640px){ .summary-cards{grid-template-columns:repeat(4,1fr);} }
   .card{background:var(--panel); padding:16px 16px;}
   .card .label{font-family:var(--mono); font-size:10.5px; color:var(--ink-dim); letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px;}
   .card .num{font-family:var(--mono); font-size:26px; font-weight:700; color:var(--amber); line-height:1;}
@@ -127,23 +142,23 @@
   th:first-child, td:first-child{text-align:left; width:64px;}
   th{color:var(--amber); font-weight:600; letter-spacing:.03em; font-size:11px; text-transform:uppercase; border-bottom:1px solid var(--amber-dim);}
   tbody tr:hover{background:var(--panel-2);}
-  td.highlight{color:var(--green); font-weight:600;}
+  td.highlight{color:var(--amber); font-weight:600;}
   /* percentile columns: white (good/low pulls) -> gray (worse/high pulls) */
-  td:nth-child(3){color:#ffffff;}
-  td:nth-child(4){color:#e6e4dc;}
-  td:nth-child(5){color:#d3d1c6;}
-  td:nth-child(6){color:#bfbdb1;}
-  td:nth-child(7){color:#acaa9d;}
-  td:nth-child(8){color:#989688;}
-  td:nth-child(9){color:#847f72;}
-  /* header gradient: 99% = base amber, brighter toward 10% */
-  th:nth-child(3){color:#fff8e6;}
-  th:nth-child(4){color:#f6eacc;}
-  th:nth-child(5){color:#eddbb2;}
-  th:nth-child(6){color:#e4cd99;}
-  th:nth-child(7){color:#dbbf7f;}
-  th:nth-child(8){color:#d2b065;}
-  th:nth-child(9){color:#c9a24b;}
+  #fortTable td:nth-child(3){color:var(--pct-1);}
+  #fortTable td:nth-child(4){color:var(--pct-2);}
+  #fortTable td:nth-child(5){color:var(--pct-3);}
+  #fortTable td:nth-child(6){color:var(--pct-4);}
+  #fortTable td:nth-child(7){color:var(--pct-5);}
+  #fortTable td:nth-child(8){color:var(--pct-6);}
+  #fortTable td:nth-child(9){color:var(--pct-7);}
+  /* header gradient: 99% = base steel blue, brighter toward 10% */
+  th:nth-child(3){color:var(--hdr-1);}
+  th:nth-child(4){color:var(--hdr-2);}
+  th:nth-child(5){color:var(--hdr-3);}
+  th:nth-child(6){color:var(--hdr-4);}
+  th:nth-child(7){color:var(--hdr-5);}
+  th:nth-child(8){color:var(--hdr-6);}
+  th:nth-child(9){color:var(--hdr-7);}
 
   .section-title{
     font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase;
@@ -153,7 +168,7 @@
     margin-top:32px; padding-top:14px; border-top:1px solid var(--line);
     font-family:var(--mono); font-size:10.5px; color:var(--ink-dim); line-height:1.8;
   }
-  footer a{color:#e5c169; text-decoration:none;}
+  footer a{color:var(--hdr-4); text-decoration:none;}
   footer a:hover{text-decoration:underline;}
   footer .footer-links{margin-top:6px;}
 </style>
@@ -182,7 +197,7 @@
         <input type="hidden" id="softStart" value="58">
         <input type="hidden" id="hardPity" value="80">
         <div class="note" style="margin-top:0; border-top:none; padding-top:0;">
-          SSR排出率：<span class="val" id="v_base">0.60</span>% / 排出率上昇：<span class="val" id="v_softStart">58</span>連以降 / 天井 <span class="val" id="v_hardPity">80</span>連
+          SSR排出率：<span class="val" id="v_base">0.60</span>% / SR排出率：<span class="val" id="v_srBase">6.0</span>% / 排出率上昇：<span class="val" id="v_softStart">58</span>連以降 / 天井 <span class="val" id="v_hardPity">80</span>連
         </div>
 
         <div class="field">
@@ -237,6 +252,11 @@
               <div class="label">目標PU数獲得率</div>
               <div class="num" id="outAtLeastX">–</div>
             </div>
+            <div class="card">
+              <div class="label">余剰欠片 期待値</div>
+              <div class="num" id="outShards">–</div>
+              <div class="sub">個</div>
+            </div>
           </div>
         </div>
       </div>
@@ -276,6 +296,8 @@
         curPityEl = $('curPity'), nPullsEl = $('nPulls'), guaranteedEl = $('guaranteed'),
         targetXEl = $('targetX');
 
+  let isWeapon = false;
+
   function syncLabels(){
     $('v_base').textContent = parseFloat(baseRateEl.value || 0).toFixed(2);
     $('v_inc').textContent = parseFloat(increaseRateEl.value || 0).toFixed(2);
@@ -283,12 +305,12 @@
     $('v_hardPity').textContent = hardPityEl.value;
     $('v_curPity').textContent = curPityEl.value;
     $('v_softLabel').textContent = softStartEl.value;
+    $('v_srBase').textContent = ((isWeapon ? 0.07 : 0.06)*100).toFixed(1);
   }
   [baseRateEl, increaseRateEl, curPityEl].forEach(el=>el.addEventListener('input', syncLabels));
   syncLabels();
 
   // Presets
-  let isWeapon = false;
   let nPullsTouched = false;
   nPullsEl.addEventListener('input', ()=>{ nPullsTouched = true; });
   function setPreset(base, soft, hard){
@@ -327,7 +349,8 @@
       hardPity: parseInt(hardPityEl.value,10),
       increaseRate: parseFloat(increaseRateEl.value)/100,
       use5050: true,
-      puChance: 0.5
+      puChance: isWeapon ? 0.75 : 0.5,
+      srBase: isWeapon ? 0.07 : 0.06
     };
   }
 
@@ -434,6 +457,72 @@
     return { expSSR, expPU, atLeast1: 1-neverPU };
   }
 
+  // Expected 余剰欠片 over N pulls. State: (ssrPity, rStreak, guaranteed, hasPU).
+  // The very first PU obtained yields no shards (it's not a duplicate); every
+  // other SSR/SR is treated as a duplicate per the "常に重複扱い" assumption.
+  function shardExpectationOverN(N, startPity, startRStreak, startGuaranteed, startHasPU, p){
+    let current = new Map();
+    current.set(startPity+'_'+startRStreak+'_'+(startGuaranteed?1:0)+'_'+(startHasPU?1:0), 1.0);
+    let expShards = 0, expSSRdup = 0, expSR = 0, expFirstPU = 0;
+    const hp = p.hardPity;
+
+    for (let t=1; t<=N; t++){
+      const next = new Map();
+      let ssrDupTotal=0, srTotal=0, firstPUTotal=0;
+      for (const [key, mass] of current){
+        if (mass<=1e-15) continue;
+        const parts = key.split('_');
+        const pity = parseInt(parts[0],10), rStreak = parseInt(parts[1],10),
+              g = parts[2]==='1', hasPU = parts[3]==='1';
+        const n = pity+1;
+        const ssrRateNormal = rateAtPull(n,p);
+        const srRateNormal = ssrRateNormal>=1 ? 0 : p.srBase;
+
+        let pSSR, pSR, pR;
+        if (rStreak===9){
+          const total = ssrRateNormal + srRateNormal;
+          if (total<=0){ pSSR=1; pSR=0; }
+          else { pSSR = ssrRateNormal/total; pSR = srRateNormal/total; }
+          pR = 0;
+        } else {
+          pSSR = ssrRateNormal;
+          pSR = srRateNormal;
+          pR = Math.max(0, 1-pSSR-pSR);
+        }
+
+        const puProbThis = g ? 1 : p.puChance;
+        const pSSR_PU = pSSR*puProbThis;
+        const pSSR_nonPU = pSSR*(1-puProbThis);
+
+        // PU outcome: first copy ever = no shards; otherwise duplicate = 60 shards
+        const pSSR_PU_first = hasPU ? 0 : pSSR_PU;
+        const pSSR_PU_dup = hasPU ? pSSR_PU : 0;
+
+        firstPUTotal += mass*pSSR_PU_first;
+        ssrDupTotal += mass*(pSSR_PU_dup + pSSR_nonPU);
+        srTotal += mass*pSR;
+
+        // transitions
+        if (pSSR_PU>1e-15) next.set('0_0_0_1',(next.get('0_0_0_1')||0)+mass*pSSR_PU);
+        if (pSSR_nonPU>1e-15) next.set('0_0_1_'+(hasPU?1:0),(next.get('0_0_1_'+(hasPU?1:0))||0)+mass*pSSR_nonPU);
+        if (pSR>1e-15){
+          const newPity = Math.min(n, hp-1);
+          const k = newPity+'_0_'+(g?1:0)+'_'+(hasPU?1:0);
+          next.set(k,(next.get(k)||0)+mass*pSR);
+        }
+        if (pR>1e-15 && n<hp){
+          const newRStreak = Math.min(rStreak+1, 9);
+          const k = n+'_'+newRStreak+'_'+(g?1:0)+'_'+(hasPU?1:0);
+          next.set(k,(next.get(k)||0)+mass*pR);
+        }
+      }
+      expSSRdup += ssrDupTotal; expSR += srTotal; expFirstPU += firstPUTotal;
+      current = next;
+    }
+    expShards = expSSRdup*60 + expSR*12;
+    return { expShards, expSSRdup, expSR, expFirstPU };
+  }
+
   function convolve(a, b, maxLen){
     const result = new Float64Array(maxLen+1);
     for (let i=1;i<=maxLen;i++){
@@ -483,6 +572,10 @@
     const summary = summaryOverN(N, curPity, guaranteed, p);
     $('outSSR').textContent = summary.expSSR.toFixed(2);
     $('outPU').textContent = summary.expPU.toFixed(2);
+
+    // 余剰欠片期待値（連続R回数は0スタート、PU未所持を前提とする）
+    const shards = shardExpectationOverN(N, curPity, 0, guaranteed, false, p);
+    $('outShards').textContent = Math.round(shards.expShards).toLocaleString();
 
     // interval max length: worst case ~ 2x hardPity (lose 5050 once) + margin
     const intervalMax = p.hardPity*2 + 5;
